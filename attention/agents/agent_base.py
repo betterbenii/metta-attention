@@ -94,8 +94,10 @@ class AgentObject:
             return str(val.get_object().content)
         return repr(val)
 
-    def __init__(self, metta=None, path=None, atoms={}, include_paths=None, code=None):
+    def __init__(self, metta=None, path=None, code=None, atoms={}, include_paths=None):
         self._metta = metta
+        self._path = path
+        self._lock = threading.Lock()  # Add lock for synchronization
         if path is None and code is None:
             # purely Python agent
             return
@@ -177,14 +179,14 @@ class AgentObject:
             return [E()]
         return st
     def run(self):
-        """Runs the agent by executing the loaded MeTTa script."""
         if self._code is None:
             print(f"Agent {self.name()} has no code to execute.")
             return
 
-        print(f"Running agent: {self.name()} from {self._code[:50]}...")  # Show first 50 chars of code
-        try:
-            results = self._metta.run(self._code)
-            print(f"Execution result for {self.name()}: {results}")
-        except Exception as e:
-            print(f"Error executing agent {self.name()}: {e}")
+        with self._lock:  # Acquire lock before execution
+            print(f"Running agent: {self.name()} from {self._code[:50]}...")
+            try:
+                results = self._metta.run(self._code)
+                print(f"Execution result for {self.name()}: {results}")
+            except Exception as e:
+                print(f"Error executing agent {self.name()}: {e}")
