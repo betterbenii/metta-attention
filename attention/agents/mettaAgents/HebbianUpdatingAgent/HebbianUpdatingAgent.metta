@@ -91,6 +91,20 @@
 ;;; Example: (targetConjunction (A B))
 ;;;          Returns Number
 
+; (: targetConjunction (-> Atom Number))
+; (= (targetConjunction $outgoing)
+;     (let*
+;         (
+;             (($source $target) $outgoing)
+;             ($normsti_i (getNormalisedZeroToOneSTI $source True True))
+;             ($normsti_j (getNormalisedZeroToOneSTI $target True True))
+;             ($conj (+ (* $normsti_i $normsti_j) (* (- $normsti_j $normsti_i) (abs-math (- $normsti_j $normsti_i)))))
+;             ($ret_conj (/ (+ $conj 1.0) 2.0))
+;         )
+;             $normsti_i
+;     )
+; )
+
 (: targetConjunction (-> Atom Number))
 (= (targetConjunction $outgoing)
     (let*
@@ -101,7 +115,7 @@
             ($conj (+ (* $normsti_i $normsti_j) (* (- $normsti_j $normsti_i) (abs-math (- $normsti_j $normsti_i)))))
             ($ret_conj (/ (+ $conj 1.0) 2.0))
         )
-            $normsti_i
+        $ret_conj  ; Correct return value
     )
 )
 
